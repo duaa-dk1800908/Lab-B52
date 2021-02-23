@@ -8,7 +8,6 @@
 <body>
 <h1>Search for university websites in <br>any country</h1>
 <hr>
-<img src="" alt="" class="logo">
 <div class="content-search">
     <form action="#" class="search">
         <label>Country Name</label>
@@ -16,34 +15,18 @@
                id="search-bar"
                placeholder="Write the country name here"/>
         <input type="submit"
+               id="search-btn"
                value="Search" name="submit"/>
     </form>
     <div class="select">
         <select
+                onchange="loadWebsite(this.value)"
                 name="universities"
-                id="universities"     
+                id="universities"
         >
-            <option selected value="" disabled>Select University website to load</option>
         </select>
     </div>
 </div>
-<hr>
-
-<div class="select">
-    <select class="select"
-            name="counties"
-            id="countries">
-        <option selected value="">Qatar</option>
-        <option selected value="">Oman</option>
-        <option selected value="">China</option>
-    </select>
-</div>
-
-<table>
-    <th>City</th>
-    <th>Total Death</th>
-</table>
-
 <hr>
 
 <h1>Website</h1>
@@ -52,6 +35,7 @@
             id="website"
             type="text/html">
 </div>
+
 <script src="js/index.js"></script>
 </body>
 </html>
