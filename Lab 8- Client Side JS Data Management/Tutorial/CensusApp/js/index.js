@@ -11,7 +11,7 @@ formElement.addEventListener('submit', addCensus)
 
 //localbase and indexDB
 //Declare the database [opening / creating]
-const db =  new Localbase('population.census.db')
+const db = new Localbase('population.census.db')
 showCensusData()
 
 async function addCensus(event) {
@@ -24,22 +24,34 @@ async function addCensus(event) {
     //take time
     const message = await db.collection('census').add(census)
     formElement.reset()
+    showCensusData();
 }
 
+async function deleteCensus(cid) {
+    await db.collection('census').doc({id: cid}).delete()
+    showCensusData();
+}
+function editCensus(cid){
+
+}
 function censusToHTMLRow(c) {
     return `
         <tr>
             <td> ${c.country}</td>
             <td> ${c.population}</td>
             <td> 
-                <i class="fa fa-pencil">Edit <i class="fa fa-trash">Delete</i>
+                <i class="fa fa-pencil" onclick="editCensus('${c.id}')">Edit</i>
+                <i class="fa fa-trash" onclick="deleteCensus('${c.id}')">Delete</i>
             </td>
         </tr>
     `
 }
-async function showCensusData(){
-    const census = await db.collection('census').get()
-    const censusRows = census.map(c=> censusToHTMLRow(c))
+
+async function showCensusData() {
+    const census = await db.collection('census')
+        .orderBy("country", "desc")
+        .get()
+    const censusRows = census.map(c => censusToHTMLRow(c))
     countriesTable.innerHTML = `
             <thead>
             <tr>
@@ -51,10 +63,11 @@ async function showCensusData(){
            <tbody>${censusRows.join('')}</tbody>
         `
 }
-function form2Object(formElement){
+
+function form2Object(formElement) {
     const formData = new FormData(formElement)  //data
     const data = {}
-    for (const [key , value] of formData) {
+    for (const [key, value] of formData) {
         data[key] = value
     }
     return data
