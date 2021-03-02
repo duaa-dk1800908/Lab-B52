@@ -4,6 +4,7 @@ const countryInputBox = document.querySelector('#country')
 const populationInputBox = document.querySelector('#population')
 const formElement = document.querySelector('#form')
 const countriesTable = document.querySelector('#countries')
+const noOfRows = document.querySelector('#no-of-rows')
 
 
 //Second step
@@ -12,27 +13,33 @@ formElement.addEventListener('submit', addCensus)
 //localbase and indexDB
 //Declare the database [opening / creating]
 const db = new Localbase('population.census.db')
-showCensusData()
+
+let isEdit = false
+let censusDocToEdit;
 
 async function addCensus(event) {
     event.preventDefault()
     const census = form2Object(formElement)
-
-    census.id = Date.now().toString()
     census.population = parseInt(census.population.toString())
 
-    //take time
-    const message = await db.collection('census').add(census)
+    if(isEdit){
+        const message = await db.collection('census').doc({id: censusDocToEdit.id}).update(census)
+    }else{
+        census.id = Date.now().toString()
+        const message = await db.collection('census').add(census)
+    }
     formElement.reset()
     showCensusData();
 }
 
 async function deleteCensus(cid) {
-    await db.collection('census').doc({id: cid}).delete()
-    showCensusData();
+    await db.collection('census').doc({id:cid}).delete()
 }
-function editCensus(cid){
-
+async function editCensus(id){
+    censusDocToEdit = await db.collection('census').doc({id}).get()
+    countryInputBox.value = censusDocToEdit.country
+    populationInputBox.value = censusDocToEdit.population
+    isEdit = true
 }
 function censusToHTMLRow(c) {
     return `
@@ -48,8 +55,10 @@ function censusToHTMLRow(c) {
 }
 
 async function showCensusData() {
+    const limit = parseInt(noOfRows.value)
     const census = await db.collection('census')
         .orderBy("country", "desc")
+        .limit(limit)
         .get()
     const censusRows = census.map(c => censusToHTMLRow(c))
     countriesTable.innerHTML = `
