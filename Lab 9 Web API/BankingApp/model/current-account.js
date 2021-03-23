@@ -1,4 +1,4 @@
-let BankAccount = require('./bank-account')
+import BankAccount from './bank-account'
 
 class CurrentAccount extends BankAccount {
 
